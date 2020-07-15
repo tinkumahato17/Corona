@@ -1,10 +1,5 @@
 package in.santiniketan.corona;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.app.DownloadManager;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -21,12 +16,16 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private ArrayList<CoronaItem> coronaItemArrayList;
     private RequestQueue requestQueue;
-    private TextView dailyDeaths, dailyConfirm, dailyReco,dateHeaders, totalDeath, totalConfirm, totalRecovered;
+    private TextView dailyDeaths, dailyConfirm, dailyReco, dateHeaders, totalDeath, totalConfirm, totalRecovered;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,13 +53,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void jsonParse() {
 
-        String url ="https://api.covid19india.org/data.json";
+        String url = "https://api.covid19india.org/data.json";
         final JsonObjectRequest request = new
-                JsonObjectRequest(Request.Method.GET,url,null, new Response.Listener<JSONObject>() {
+                JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-
-
                 try {
 
                     //first fetch the header and display it
@@ -74,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
                     String dailyConfirmed = todayAndTotalDataJsonObject.getString("deltaconfirmed");
                     String dailyDeath = todayAndTotalDataJsonObject.getString("deltadeaths");
                     String dailyRec = todayAndTotalDataJsonObject.getString("deltarecovered");
-                    String dataHeader = todayAndTotalDataJsonObject.getString("lastupdatedtime").substring(0,5);
+                    String dataHeader = todayAndTotalDataJsonObject.getString("lastupdatedtime").substring(0, 5);
                     dataHeader = getFormattedDate(dataHeader);
 
                     // Method implemented
@@ -98,37 +95,38 @@ public class MainActivity extends AppCompatActivity {
                     //now fetch and display the dat6a for all the states
                     //this data is also present in the todayAndTotalDataArray from index 1
 
-                   for (int i=1;i<todayAndTotalDataArray.length();i++){
+                    for (int i = 1; i < todayAndTotalDataArray.length(); i++) {
 
-                       JSONObject stateWiseArrayJSONObject = todayAndTotalDataArray.getJSONObject(i);
-                       String  active = stateWiseArrayJSONObject.getString("active");
-                       String  death = stateWiseArrayJSONObject.getString("deaths");
-                       String  recovered = stateWiseArrayJSONObject.getString("recovered");
-                       String  state = stateWiseArrayJSONObject.getString("state");
-                       String  confirmed = stateWiseArrayJSONObject.getString("confirmed");
-                       String  lastUpdated = stateWiseArrayJSONObject.getString("lastupdatedtime");
+                        JSONObject stateWiseArrayJSONObject = todayAndTotalDataArray.getJSONObject(i);
+                        String active = stateWiseArrayJSONObject.getString("active");
+                        String death = stateWiseArrayJSONObject.getString("deaths");
+                        String recovered = stateWiseArrayJSONObject.getString("recovered");
+                        String state = stateWiseArrayJSONObject.getString("state");
+                        String confirmed = stateWiseArrayJSONObject.getString("confirmed");
+                        String lastUpdated = stateWiseArrayJSONObject.getString("lastupdatedtime");
 
-                       //Now the details of today cases for each individual state
+                        //Now the details of today cases for each individual state
 
-                       String todayActive = stateWiseArrayJSONObject.getString("deltaconfirmed");
-                       String todayDeath = stateWiseArrayJSONObject.getString("deltadeaths");
-                       String todayRecovered = stateWiseArrayJSONObject.getString("deltarecovered");
+                        String todayActive = stateWiseArrayJSONObject.getString("deltaconfirmed");
+                        String todayDeath = stateWiseArrayJSONObject.getString("deltadeaths");
+                        String todayRecovered = stateWiseArrayJSONObject.getString("deltarecovered");
 
-                       //now pass all details to coronaItem class
+                        //now pass all details to coronaItem class
 
-                       CoronaItem coronaItem = new CoronaItem(state,death,active,recovered,confirmed,lastUpdated,todayDeath,todayRecovered,todayActive);
-                       coronaItemArrayList.add(coronaItem);
+                        CoronaItem coronaItem = new CoronaItem(state, death, active, recovered, confirmed, lastUpdated, todayDeath, todayRecovered, todayActive);
+                        coronaItemArrayList.add(coronaItem);
 
-                   }
+                    }
 
-                   //now we just have to set up the recyclerView to display  the content or data
+                    //now we just have to set up the recyclerView to display  the content or data
 
-                    RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(MainActivity.this,coronaItemArrayList);
+                    RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(MainActivity.this, coronaItemArrayList);
+                    recyclerView.setAdapter(recyclerViewAdapter);
 
 
                 }
                 // Try statement must have the catch statement.
-                catch (JSONException e){
+                catch (JSONException e) {
                     e.printStackTrace();
                 }
 
@@ -140,36 +138,40 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        /*_____Code added by Dipantan_____*/
+        requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(request);
     }
 
-    private String getFormattedDate(String dateHeader){
+    private String getFormattedDate(String dateHeader) {
 
-        switch (dateHeader.substring(3,5)){
+        switch (dateHeader.substring(3, 5)) {
 
-            case "01" :
-                return dateHeader.substring(0,2)+" Jan";
-            case "02" :
-                return dateHeader.substring(0,2)+" Feb";
-            case "03" :
-                return dateHeader.substring(0,2)+" Mar";
-            case "04" :
-                return dateHeader.substring(0,2)+" Apr";
-            case "05" :
-                return dateHeader.substring(0,2)+" May";
-            case "06" :
-                return dateHeader.substring(0,2)+" Jun";
-            case "07" :
-                return dateHeader.substring(0,2)+" Jul";
-            case "08" :
-                return dateHeader.substring(0,2)+" Aug";
-            case "09" :
-                return dateHeader.substring(0,2)+" Sep";
-            case "10" :
-                return dateHeader.substring(0,2)+" Oct";
-            case "11" :
-                return dateHeader.substring(0,2)+" Nov";
-            case "12" :
-                return dateHeader.substring(0,2)+" Dec";
+            case "01":
+                return dateHeader.substring(0, 2) + " Jan";
+            case "02":
+                return dateHeader.substring(0, 2) + " Feb";
+            case "03":
+                return dateHeader.substring(0, 2) + " Mar";
+            case "04":
+                return dateHeader.substring(0, 2) + " Apr";
+            case "05":
+                return dateHeader.substring(0, 2) + " May";
+            case "06":
+                return dateHeader.substring(0, 2) + " Jun";
+            case "07":
+                return dateHeader.substring(0, 2) + " Jul";
+            case "08":
+                return dateHeader.substring(0, 2) + " Aug";
+            case "09":
+                return dateHeader.substring(0, 2) + " Sep";
+            case "10":
+                return dateHeader.substring(0, 2) + " Oct";
+            case "11":
+                return dateHeader.substring(0, 2) + " Nov";
+            case "12":
+                return dateHeader.substring(0, 2) + " Dec";
 
             default:
                 return null;
